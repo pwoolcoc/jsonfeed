@@ -1,10 +1,10 @@
 [package]
 name = "jsonfeed"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Paul Woolcock <paul@woolcock.us>"]
 documentation = "https://docs.rs/jsonfeed"
 homepage = "https://github.com/pwoolcoc/jsonfeed"
-readme = "README.md"
+readme = "README.adoc"
 license = "MIT/Apache-2.0"
 description = """
 Parser for the [JSONFeed](http://jsonfeed.org) specification
@@ -13,3 +13,6 @@ Parser for the [JSONFeed](http://jsonfeed.org) specification
 [dependencies]
 serde = "1"
 serde_derive = "1"
+
+[dev-dependencies]
+serde_json = "1"

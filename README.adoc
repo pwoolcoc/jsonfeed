@@ -1,0 +1,5 @@
+= JSONFeed Parser
+
+This is a [JSONFeed](http://jsonfeed.org) parser in Rust
+
+Alpha, still needs lots of testing
