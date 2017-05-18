@@ -1,5 +1,18 @@
 = JSONFeed Parser
 
-This is a [JSONFeed](http://jsonfeed.org) parser in Rust
+This is a http://jsonfeed.org[JSONFeed] parser in Rust
 
 Alpha, still needs lots of testing
+
+== Example
+
+----
+extern crate jsonfeed;
+
+use jsonfeed::{self, Feed};
+
+fn main() {
+	let source = "{...}";
+	let feed: Feed = jsonfeed::from_str(source).unwrap();
+}
+----
