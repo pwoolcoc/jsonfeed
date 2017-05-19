@@ -53,6 +53,8 @@ pub use errors::*;
 pub use item::*;
 pub use feed::{Feed, Author, Content, Attachment};
 
+use std::io::Write;
+
 /// Attempts to convert a string slice to a Feed object
 ///
 /// Example
@@ -86,3 +88,43 @@ pub fn from_slice<'a>(v: &'a [u8]) -> Result<Feed> {
 pub fn from_value(value: serde_json::Value) -> Result<Feed> {
     Ok(serde_json::from_value(value)?)
 }
+
+/// Serialize a Feed to a JSON Feed string
+pub fn to_string(value: &Feed) -> Result<String> {
+    Ok(serde_json::to_string(value)?)
+}
+
+/// Pretty-print a Feed to a JSON Feed string
+pub fn to_string_pretty(value: &Feed) -> Result<String> {
+    Ok(serde_json::to_string_pretty(value)?)
+}
+
+/// Convert a Feed to a serde_json::Value
+pub fn to_value(value: Feed) -> Result<serde_json::Value> {
+    Ok(serde_json::to_value(value)?)
+}
+
+/// Convert a Feed to a vector of bytes of JSON
+pub fn to_vec(value: &Feed) -> Result<Vec<u8>> {
+    Ok(serde_json::to_vec(value)?)
+}
+
+/// Convert a Feed to a vector of bytes of pretty-printed JSON
+pub fn to_vec_pretty(value: &Feed) -> Result<Vec<u8>> {
+    Ok(serde_json::to_vec_pretty(value)?)
+}
+
+/// Serialize a Feed to JSON and output to an IO stream
+pub fn to_writer<W>(writer: W, value: &Feed) -> Result<()>
+        where W: Write
+{
+    Ok(serde_json::to_writer(writer, value)?)
+}
+
+/// Serialize a Feed to pretty-printed JSON and output to an IO stream
+pub fn to_writer_pretty<W>(writer: W, value: &Feed) -> Result<()>
+        where W: Write
+{
+    Ok(serde_json::to_writer_pretty(writer, value)?)
+}
+

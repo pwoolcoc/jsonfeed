@@ -1,8 +1,5 @@
 use std::default::Default;
 
-use serde_json;
-
-use errors::*;
 use item::Item;
 use builder::Builder;
 
@@ -21,7 +18,7 @@ const VERSION_1: &'static str = "https://jsonfeed.org/version/1";
 /// # fn main() {
 /// let feed: Feed = Feed::default();
 /// assert_eq!(
-///     feed.to_string().unwrap(),
+///     jsonfeed::to_string(&feed).unwrap(),
 ///     "{\"version\":\"https://jsonfeed.org/version/1\",\"title\":\"\",\"items\":[]}"
 /// );
 /// # }
@@ -69,16 +66,7 @@ pub struct Feed {
 }
 
 impl Feed {
-    /// Serialize a Feed to a JSON Feed string
-    pub fn to_string(&self) -> Result<String> {
-        Ok(serde_json::to_string(self)?)
-    }
-
-    /// Pretty-print a Feed to a JSON Feed string
-    pub fn to_string_pretty(&self) -> Result<String> {
-        Ok(serde_json::to_string_pretty(self)?)
-    }
-
+    /// Used to construct a Feed object
     pub fn builder() -> Builder {
         Builder::new()
     }
