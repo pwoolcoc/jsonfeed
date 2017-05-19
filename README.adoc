@@ -1,6 +1,6 @@
-= JSONFeed Parser
+= JSON Feed Parser
 
-This is a http://jsonfeed.org[JSONFeed] parser in Rust. Just a thin layer on top of `serde`, but it
+This is a http://jsonfeed.org[JSON Feed] parser in Rust. Just a thin layer on top of `serde`, but it
 provides serialization & deserialization, along with a Builder API for constructing feeds.
 
 Note that this is alpha, I still need to add a lot of tests and a couple more features.
@@ -9,12 +9,14 @@ Note that this is alpha, I still need to add a lot of tests and a couple more fe
 
 ----
 extern crate jsonfeed;
+extern crate reqwest;
 
 use jsonfeed::{self, Feed};
 
 fn main() {
-	let source = "{...}";
-	let feed: Feed = jsonfeed::from_str(source).unwrap();
+	let resp = reqwest::get("https://example.com/feed.json").unwrap();
+	let feed = jsonfeed::from_reader(resp).unwrap();
+	println!("Feed title is: {}", feed.title);
 }
 ----
 
