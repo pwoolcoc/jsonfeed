@@ -16,3 +16,7 @@ fn main() {
 	let feed: Feed = jsonfeed::from_str(source).unwrap();
 }
 ----
+
+TODO:
+
+* Implement ability to add, serialize, and deserialize custom attributes from the json feed spec

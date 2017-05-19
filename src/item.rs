@@ -69,10 +69,10 @@ impl Serialize for Item {
         match self.content {
             Content::Html(ref s) => {
                 state.serialize_field("content_html", s)?;
-                state.serialize_field("content_text", &None::<Option<String>>)?;
+                state.serialize_field("content_text", &None::<Option<&str>>)?;
             },
             Content::Text(ref s) => {
-                state.serialize_field("content_html", &None::<Option<String>>)?;
+                state.serialize_field("content_html", &None::<Option<&str>>)?;
                 state.serialize_field("content_text", s)?;
             },
             Content::Both(ref s, ref t) => {
@@ -184,8 +184,8 @@ impl<'de> Deserialize<'de> for Item {
                 let mut url = None;
                 let mut external_url = None;
                 let mut title = None;
-                let mut content_html: Option<&'de str> = None;
-                let mut content_text: Option<&'de str> = None;
+                let mut content_html: Option<String> = None;
+                let mut content_text: Option<String> = None;
                 let mut summary = None;
                 let mut image = None;
                 let mut banner_image = None;
