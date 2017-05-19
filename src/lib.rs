@@ -1,58 +1,88 @@
-//! JSONFeed Parser
+//! JSON Feed is a syndication format similar to ATOM and RSS, using JSON
+//! instead of XML
 //!
+//! This crate can serialize and deserialize between JSON Feed strings
+//! and Rust data structures. It also allows for programmatically building 
+//! a JSON Feed
+//!
+//! Example:
+//!
+//! ```rust
+//! extern crate jsonfeed;
+//!
+//! use jsonfeed::{Feed, Item};
+//!
+//! fn run() -> Result<(), jsonfeed::Error> {
+//!     let j = r#"{
+//!         "title": "my feed",
+//!         "version": "https://jsonfeed.org/version/1",
+//!         "items": []
+//!     }"#;
+//!     let feed: Feed = jsonfeed::from_str(j).unwrap();
+//!
+//!     let new_feed = Feed::builder()
+//!                         .title("some other feed")
+//!                         .item(Item::builder()
+//!                                 .title("some item title")
+//!                                 .content_html("<p>Hello, World</p>")
+//!                                 .build()?)
+//!                         .item(Item::builder()
+//!                                 .title("some other item title")
+//!                                 .content_text("Hello, World!")
+//!                                 .build()?)
+//!                         .build();
+//!     println!("{}", new_feed.to_string().unwrap());
+//!     Ok(())
+//! }
+//! fn main() {
+//!     let _ = run();
+//! }
+//! ```
 
 extern crate serde;
+#[macro_use] extern crate error_chain;
 #[macro_use] extern crate serde_derive;
-#[cfg(test)] extern crate serde_json;
+extern crate serde_json;
 
+mod errors;
 mod item;
+mod feed;
+mod builder;
 
+pub use errors::*;
 pub use item::*;
+pub use feed::{Feed, Author, Content, Attachment};
 
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct Feed {
-    version: String,
-    title: String,
-    items: Vec<Item>,
-    home_page_url: Option<String>,
-    feed_url: Option<String>,
-    description: Option<String>,
-    user_comment: Option<String>,
-    next_url: Option<String>,
-    icon: Option<String>,
-    favicon: Option<String>,
-    author: Option<Author>,
-    expired: Option<bool>,
-    hubs: Option<Vec<Hub>>,
+/// Attempts to convert a string slice to a Feed object
+///
+/// Example
+///
+/// ```rust
+/// # extern crate jsonfeed;
+/// # use jsonfeed::Feed;
+/// # use std::default::Default;
+/// # fn main() {
+/// let json = r#"{"version": "https://jsonfeed.org/version/1", "title": "", "items": []}"#;
+/// let feed: Feed = jsonfeed::from_str(&json).unwrap();
+///
+/// assert_eq!(feed, Feed::default());
+/// # }
+/// ```
+pub fn from_str(s: &str) -> Result<Feed> {
+    Ok(serde_json::from_str(s)?)
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub enum Content {
-    Html(String),
-    Text(String),
-    Both(String, String),
+/// Deserialize a Feed object from an IO stream of JSON
+pub fn from_reader<R: ::std::io::Read>(r: R) -> Result<Feed> {
+    Ok(serde_json::from_reader(r)?)
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct Attachment {
-    url: String,
-    mime_type: String,
-    title: Option<String>,
-    size_in_bytes: f64,
-    duration_in_seconds: f64,
+/// Deserialize a Feed object from bytes of JSON text
+pub fn from_slice<'a>(v: &'a [u8]) -> Result<Feed> {
+    Ok(serde_json::from_slice(v)?)
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct Author {
-    name: Option<String>,
-    url: Option<String>,
-    avatar: Option<String>,
+/// Convert a serde_json::Value type to a Feed object
+pub fn from_value(value: serde_json::Value) -> Result<Feed> {
+    Ok(serde_json::from_value(value)?)
 }
-
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct Hub {
-    #[serde(rename = "type")]
-    type_: String,
-    url: String,
-}
-

@@ -1,25 +1,54 @@
 use std::fmt;
+use std::default::Default;
 
-use {Author, Content, Attachment};
+use feed::{Author, Content, Attachment};
+use builder::ItemBuilder;
 
 use serde::ser::{Serialize, Serializer, SerializeStruct};
 use serde::de::{self, Deserialize, Deserializer, Visitor, MapAccess};
 
+/// Represents an item in a feed
 #[derive(Debug, Clone, PartialEq)]
 pub struct Item {
-    id: String,
-    url: Option<String>,
-    external_url: Option<String>,
-    title: Option<String>,
-    content: Content,
-    summary: Option<String>,
-    image: Option<String>,
-    banner_image: Option<String>,
-    date_published: Option<String>, // todo DateTime objects?
-    date_modified: Option<String>,
-    author: Option<Author>,
-    tags: Option<Vec<String>>,
-    attachments: Option<Vec<Attachment>>,
+    pub id: String,
+    pub url: Option<String>,
+    pub external_url: Option<String>,
+    pub title: Option<String>,
+    pub content: Content,
+    pub summary: Option<String>,
+    pub image: Option<String>,
+    pub banner_image: Option<String>,
+    pub date_published: Option<String>, // todo DateTime objects?
+    pub date_modified: Option<String>,
+    pub author: Option<Author>,
+    pub tags: Option<Vec<String>>,
+    pub attachments: Option<Vec<Attachment>>,
+}
+
+impl Item {
+    pub fn builder() -> ItemBuilder {
+        ItemBuilder::new()
+    }
+}
+
+impl Default for Item {
+    fn default() -> Item {
+        Item {
+            id: "".to_string(),
+            url: None,
+            external_url: None,
+            title: None,
+            content: Content::Text("".into()),
+            summary: None,
+            image: None,
+            banner_image: None,
+            date_published: None,
+            date_modified: None,
+            author: None,
+            tags: None,
+            attachments: None,
+        }
+    }
 }
 
 impl Serialize for Item {
@@ -28,9 +57,15 @@ impl Serialize for Item {
     {
         let mut state = serializer.serialize_struct("Item", 14)?;
         state.serialize_field("id", &self.id)?;
-        state.serialize_field("url", &self.url)?;
-        state.serialize_field("external_url", &self.external_url)?;
-        state.serialize_field("title", &self.title)?;
+        if self.url.is_some() {
+            state.serialize_field("url", &self.url)?;
+        }
+        if self.external_url.is_some() {
+            state.serialize_field("external_url", &self.external_url)?;
+        }
+        if self.title.is_some() {
+            state.serialize_field("title", &self.title)?;
+        }
         match self.content {
             Content::Html(ref s) => {
                 state.serialize_field("content_html", s)?;
@@ -45,14 +80,30 @@ impl Serialize for Item {
                 state.serialize_field("content_text", t)?;
             },
         };
-        state.serialize_field("summary", &self.summary)?;
-        state.serialize_field("image", &self.image)?;
-        state.serialize_field("banner_image", &self.banner_image)?;
-        state.serialize_field("date_published", &self.date_published)?;
-        state.serialize_field("date_modified", &self.date_modified)?;
-        state.serialize_field("author", &self.author)?;
-        state.serialize_field("tags", &self.tags)?;
-        state.serialize_field("attachments", &self.attachments)?;
+        if self.summary.is_some() {
+            state.serialize_field("summary", &self.summary)?;
+        }
+        if self.image.is_some() {
+            state.serialize_field("image", &self.image)?;
+        }
+        if self.banner_image.is_some() {
+            state.serialize_field("banner_image", &self.banner_image)?;
+        }
+        if self.date_published.is_some() {
+            state.serialize_field("date_published", &self.date_published)?;
+        }
+        if self.date_modified.is_some() {
+            state.serialize_field("date_modified", &self.date_modified)?;
+        }
+        if self.author.is_some() {
+            state.serialize_field("author", &self.author)?;
+        }
+        if self.tags.is_some() {
+            state.serialize_field("tags", &self.tags)?;
+        }
+        if self.attachments.is_some() {
+            state.serialize_field("attachments", &self.attachments)?;
+        }
         state.end()
     }
 }
@@ -286,6 +337,4 @@ impl<'de> Deserialize<'de> for Item {
 
 #[cfg(test)]
 mod tests {
-    use super::{Content, Item};
-    use serde_json;
 }
