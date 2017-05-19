@@ -1,8 +1,9 @@
 = JSONFeed Parser
 
-This is a http://jsonfeed.org[JSONFeed] parser in Rust
+This is a http://jsonfeed.org[JSONFeed] parser in Rust. Just a thin layer on top of `serde`, but it
+provides serialization & deserialization, along with a Builder API for constructing feeds.
 
-Alpha, still needs lots of testing
+Note that this is alpha, I still need to add a lot of tests and a couple more features.
 
 == Example
 
@@ -19,4 +20,5 @@ fn main() {
 
 TODO:
 
+* Tests. Lots and lots of tests
 * Implement ability to add, serialize, and deserialize custom attributes from the json feed spec
