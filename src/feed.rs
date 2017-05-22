@@ -98,8 +98,8 @@ pub struct Attachment {
     url: String,
     mime_type: String,
     title: Option<String>,
-    size_in_bytes: f64,
-    duration_in_seconds: f64,
+    size_in_bytes: Option<u64>,
+    duration_in_seconds: Option<u64>,
 }
 
 /// Represents an `author` in both a feed and a feed item
@@ -188,25 +188,25 @@ mod tests {
             url: "http://example.com".to_string(),
             mime_type: "application/json".to_string(),
             title: Some("some title".to_string()),
-            size_in_bytes: 1.0f64,
-            duration_in_seconds: 1.0f64,
+            size_in_bytes: Some(1),
+            duration_in_seconds: Some(1),
         };
         assert_eq!(
             serde_json::to_string(&attachment).unwrap(),
-            r#"{"url":"http://example.com","mime_type":"application/json","title":"some title","size_in_bytes":1.0,"duration_in_seconds":1.0}"#
+            r#"{"url":"http://example.com","mime_type":"application/json","title":"some title","size_in_bytes":1,"duration_in_seconds":1}"#
         );
     }
 
     #[test]
     fn deserialize_attachment() {
-        let json = r#"{"url":"http://example.com","mime_type":"application/json","title":"some title","size_in_bytes":1.0,"duration_in_seconds":1.0}"#;
+        let json = r#"{"url":"http://example.com","mime_type":"application/json","title":"some title","size_in_bytes":1,"duration_in_seconds":1}"#;
         let attachment: Attachment = serde_json::from_str(&json).unwrap();
         let expected = Attachment {
             url: "http://example.com".to_string(),
             mime_type: "application/json".to_string(),
             title: Some("some title".to_string()),
-            size_in_bytes: 1.0f64,
-            duration_in_seconds: 1.0f64,
+            size_in_bytes: Some(1),
+            duration_in_seconds: Some(1),
         };
         assert_eq!(
             attachment,
@@ -266,5 +266,31 @@ mod tests {
             hub,
             expected
         );
+    }
+
+    #[test]
+    fn deser_podcast() {
+        let json = r#"{
+  "version": "https://jsonfeed.org/version/1",
+  "title": "Timetable",
+  "home_page_url": "http://timetable.manton.org/",
+  "items": [
+    {
+      "id": "http://timetable.manton.org/2017/04/episode-45-launch-week/",
+      "url": "http://timetable.manton.org/2017/04/episode-45-launch-week/",
+      "title": "Episode 45: Launch week",
+      "content_html": "I’m rolling out early access to Micro.blog this week. I talk about how the first 2 days have gone, mistakes with TestFlight, and what to do next.",
+      "date_published": "2017-04-26T01:09:45+00:00",
+      "attachments": [
+        {
+          "url": "http://timetable.manton.org/podcast-download/139/episode-45-launch-week.mp3",
+          "mime_type": "audio/mpeg",
+          "size_in_bytes": 5236920
+        }
+      ]
+    }
+  ]
+}"#;
+        serde_json::from_str::<Feed>(&json).expect("Failed to deserialize podcast feed");
     }
 }
