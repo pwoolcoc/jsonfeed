@@ -11,8 +11,6 @@ Note that this is alpha, I still need to add a lot of tests and a couple more fe
 extern crate jsonfeed;
 extern crate reqwest;
 
-use jsonfeed::{self, Feed};
-
 fn main() {
 	let resp = reqwest::get("https://example.com/feed.json").unwrap();
 	let feed = jsonfeed::from_reader(resp).unwrap();
