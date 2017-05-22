@@ -92,14 +92,6 @@ impl Default for Feed {
     }
 }
 
-/// Represents the `content_html` and `content_text` attributes of an item
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub enum Content {
-    Html(String),
-    Text(String),
-    Both(String, String),
-}
-
 /// Represents an `attachment` for an item
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Attachment {
@@ -118,6 +110,31 @@ pub struct Author {
     avatar: Option<String>,
 }
 
+impl Author {
+    pub fn new() -> Author {
+        Author {
+            name: None,
+            url: None,
+            avatar: None,
+        }
+    }
+
+    pub fn name<I: Into<String>>(mut self, name: I) -> Self {
+        self.name = Some(name.into());
+        self
+    }
+
+    pub fn url<I: Into<String>>(mut self, url: I) -> Self {
+        self.url = Some(url.into());
+        self
+    }
+
+    pub fn avatar<I: Into<String>>(mut self, avatar: I) -> Self {
+        self.avatar = Some(avatar.into());
+        self
+    }
+}
+
 /// Represents a `hub` for a feed
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Hub {
@@ -126,4 +143,128 @@ pub struct Hub {
     url: String,
 }
 
+#[cfg(test)]
+mod tests {
+    use serde_json;
+    use std::default::Default;
+    use super::*;
 
+    #[test]
+    fn serialize_feed() {
+        let feed = Feed {
+            version: "https://jsonfeed.org/version/1".to_string(),
+            title: "some title".to_string(),
+            items: vec![],
+            home_page_url: None,
+            description: None,
+            expired: Some(true),
+            ..Default::default()
+        };
+        assert_eq!(
+            serde_json::to_string(&feed).unwrap(),
+            r#"{"version":"https://jsonfeed.org/version/1","title":"some title","items":[],"expired":true}"#
+        );
+    }
+
+    #[test]
+    fn deserialize_feed() {
+        let json = r#"{"version":"https://jsonfeed.org/version/1","title":"some title","items":[]}"#;
+        let feed: Feed = serde_json::from_str(&json).unwrap();
+        let expected = Feed {
+            version: "https://jsonfeed.org/version/1".to_string(),
+             title: "some title".to_string(),
+             items: vec![],
+             ..Default::default()
+        };
+        assert_eq!(
+            feed,
+            expected
+        );
+    }
+
+    #[test]
+    fn serialize_attachment() {
+        let attachment = Attachment {
+            url: "http://example.com".to_string(),
+            mime_type: "application/json".to_string(),
+            title: Some("some title".to_string()),
+            size_in_bytes: 1.0f64,
+            duration_in_seconds: 1.0f64,
+        };
+        assert_eq!(
+            serde_json::to_string(&attachment).unwrap(),
+            r#"{"url":"http://example.com","mime_type":"application/json","title":"some title","size_in_bytes":1.0,"duration_in_seconds":1.0}"#
+        );
+    }
+
+    #[test]
+    fn deserialize_attachment() {
+        let json = r#"{"url":"http://example.com","mime_type":"application/json","title":"some title","size_in_bytes":1.0,"duration_in_seconds":1.0}"#;
+        let attachment: Attachment = serde_json::from_str(&json).unwrap();
+        let expected = Attachment {
+            url: "http://example.com".to_string(),
+            mime_type: "application/json".to_string(),
+            title: Some("some title".to_string()),
+            size_in_bytes: 1.0f64,
+            duration_in_seconds: 1.0f64,
+        };
+        assert_eq!(
+            attachment,
+            expected
+        );
+    }
+
+    #[test]
+    fn serialize_author() {
+        let author = Author {
+            name: Some("bob jones".to_string()),
+            url: Some("http://example.com".to_string()),
+            avatar: Some("http://img.com/blah".to_string()),
+        };
+        assert_eq!(
+            serde_json::to_string(&author).unwrap(),
+            r#"{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"}"#
+        );
+    }
+
+    #[test]
+    fn deserialize_author() {
+        let json = r#"{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"}"#;
+        let author: Author = serde_json::from_str(&json).unwrap();
+        let expected = Author {
+            name: Some("bob jones".to_string()),
+            url: Some("http://example.com".to_string()),
+            avatar: Some("http://img.com/blah".to_string()),
+        };
+        assert_eq!(
+            author,
+            expected
+        );
+    }
+
+    #[test]
+    fn serialize_hub() {
+        let hub = Hub {
+            type_: "some-type".to_string(),
+            url: "http://example.com".to_string(),
+        };
+        assert_eq!(
+            serde_json::to_string(&hub).unwrap(),
+            r#"{"type":"some-type","url":"http://example.com"}"#
+        )
+    }
+
+    #[test]
+    fn deserialize_hub() {
+        let json = r#"{"type":"some-type","url":"http://example.com"}"#;
+        let hub: Hub = serde_json::from_str(&json).unwrap();
+        let expected = Hub {
+            type_: "some-type".to_string(),
+            url: "http://example.com".to_string(),
+        };
+        assert_eq!(
+            hub,
+            expected
+        );
+    }
+}

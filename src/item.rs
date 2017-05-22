@@ -1,11 +1,19 @@
 use std::fmt;
 use std::default::Default;
 
-use feed::{Author, Content, Attachment};
+use feed::{Author, Attachment};
 use builder::ItemBuilder;
 
 use serde::ser::{Serialize, Serializer, SerializeStruct};
 use serde::de::{self, Deserialize, Deserializer, Visitor, MapAccess};
+
+/// Represents the `content_html` and `content_text` attributes of an item
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+pub enum Content {
+    Html(String),
+    Text(String),
+    Both(String, String),
+}
 
 /// Represents an item in a feed
 #[derive(Debug, Clone, PartialEq)]
@@ -337,4 +345,149 @@ impl<'de> Deserialize<'de> for Item {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use feed::Author;
+    use serde_json;
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn serialize_item__content_html() {
+        let item = Item {
+            id: "1".into(),
+            url: Some("http://example.com/feed.json".into()),
+            external_url: Some("http://example.com/feed.json".into()),
+            title: Some("feed title".into()),
+            content: Content::Html("<p>content</p>".into()),
+            summary: Some("feed summary".into()),
+            image: Some("http://img.com/blah".into()),
+            banner_image: Some("http://img.com/blah".into()),
+            date_published: Some("2017-01-01 10:00:00".into()),
+            date_modified: Some("2017-01-01 10:00:00".into()),
+            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            tags: Some(vec!["json".into(), "feed".into()]),
+            attachments: Some(vec![]),
+        };
+        assert_eq!(
+            serde_json::to_string(&item).unwrap(),
+            r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":null,"summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#
+        );
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn serialize_item__content_text() {
+        let item = Item {
+            id: "1".into(),
+            url: Some("http://example.com/feed.json".into()),
+            external_url: Some("http://example.com/feed.json".into()),
+            title: Some("feed title".into()),
+            content: Content::Text("content".into()),
+            summary: Some("feed summary".into()),
+            image: Some("http://img.com/blah".into()),
+            banner_image: Some("http://img.com/blah".into()),
+            date_published: Some("2017-01-01 10:00:00".into()),
+            date_modified: Some("2017-01-01 10:00:00".into()),
+            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            tags: Some(vec!["json".into(), "feed".into()]),
+            attachments: Some(vec![]),
+        };
+        assert_eq!(
+            serde_json::to_string(&item).unwrap(),
+            r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":null,"content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#
+        );
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn serialize_item__content_both() {
+        let item = Item {
+            id: "1".into(),
+            url: Some("http://example.com/feed.json".into()),
+            external_url: Some("http://example.com/feed.json".into()),
+            title: Some("feed title".into()),
+            content: Content::Both("<p>content</p>".into(), "content".into()),
+            summary: Some("feed summary".into()),
+            image: Some("http://img.com/blah".into()),
+            banner_image: Some("http://img.com/blah".into()),
+            date_published: Some("2017-01-01 10:00:00".into()),
+            date_modified: Some("2017-01-01 10:00:00".into()),
+            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            tags: Some(vec!["json".into(), "feed".into()]),
+            attachments: Some(vec![]),
+        };
+        assert_eq!(
+            serde_json::to_string(&item).unwrap(),
+            r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#
+        );
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn deserialize_item__content_html() {
+        let json = r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":null,"summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#;
+        let item: Item = serde_json::from_str(&json).unwrap();
+        let expected = Item {
+            id: "1".into(),
+            url: Some("http://example.com/feed.json".into()),
+            external_url: Some("http://example.com/feed.json".into()),
+            title: Some("feed title".into()),
+            content: Content::Html("<p>content</p>".into()),
+            summary: Some("feed summary".into()),
+            image: Some("http://img.com/blah".into()),
+            banner_image: Some("http://img.com/blah".into()),
+            date_published: Some("2017-01-01 10:00:00".into()),
+            date_modified: Some("2017-01-01 10:00:00".into()),
+            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            tags: Some(vec!["json".into(), "feed".into()]),
+            attachments: Some(vec![]),
+        };
+        assert_eq!(item, expected);
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn deserialize_item__content_text() {
+        let json = r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":null,"content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#;
+        let item: Item = serde_json::from_str(&json).unwrap();
+        let expected = Item {
+            id: "1".into(),
+            url: Some("http://example.com/feed.json".into()),
+            external_url: Some("http://example.com/feed.json".into()),
+            title: Some("feed title".into()),
+            content: Content::Text("content".into()),
+            summary: Some("feed summary".into()),
+            image: Some("http://img.com/blah".into()),
+            banner_image: Some("http://img.com/blah".into()),
+            date_published: Some("2017-01-01 10:00:00".into()),
+            date_modified: Some("2017-01-01 10:00:00".into()),
+            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            tags: Some(vec!["json".into(), "feed".into()]),
+            attachments: Some(vec![]),
+        };
+        assert_eq!(item, expected);
+    }
+
+    #[test]
+    #[allow(non_snake_case)]
+    fn deserialize_item__content_both() {
+        let json = r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#;
+        let item: Item = serde_json::from_str(&json).unwrap();
+        let expected = Item {
+            id: "1".into(),
+            url: Some("http://example.com/feed.json".into()),
+            external_url: Some("http://example.com/feed.json".into()),
+            title: Some("feed title".into()),
+            content: Content::Both("<p>content</p>".into(), "content".into()),
+            summary: Some("feed summary".into()),
+            image: Some("http://img.com/blah".into()),
+            banner_image: Some("http://img.com/blah".into()),
+            date_published: Some("2017-01-01 10:00:00".into()),
+            date_modified: Some("2017-01-01 10:00:00".into()),
+            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            tags: Some(vec!["json".into(), "feed".into()]),
+            attachments: Some(vec![]),
+        };
+        assert_eq!(item, expected);
+    }
 }
+

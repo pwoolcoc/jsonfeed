@@ -1,8 +1,8 @@
 use std::default::Default;
 
 use errors::*;
-use feed::{Feed, Content, Author, Attachment};
-use item::Item;
+use feed::{Feed, Author, Attachment};
+use item::{Content, Item};
 
 /// Feed Builder
 ///

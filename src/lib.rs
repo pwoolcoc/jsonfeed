@@ -51,7 +51,7 @@ mod builder;
 
 pub use errors::*;
 pub use item::*;
-pub use feed::{Feed, Author, Content, Attachment};
+pub use feed::{Feed, Author, Attachment};
 
 use std::io::Write;
 
