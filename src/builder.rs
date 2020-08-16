@@ -34,6 +34,7 @@ impl Builder {
 /// Builder object for an item in a feed
 pub struct ItemBuilder {
     pub id: Option<String>,
+    pub language: Option<String>,
     pub url: Option<String>,
     pub external_url: Option<String>,
     pub title: Option<String>,
@@ -53,6 +54,7 @@ impl ItemBuilder {
     pub fn new() -> ItemBuilder {
         ItemBuilder {
             id: None,
+            language: None,
             url: None,
             external_url: None,
             title: None,
@@ -104,6 +106,7 @@ impl ItemBuilder {
         }
         Ok(Item {
             id: self.id.unwrap(),
+            language: self.language,
             url: self.url,
             external_url: self.external_url,
             title: self.title,

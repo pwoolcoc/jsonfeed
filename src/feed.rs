@@ -44,6 +44,8 @@ pub struct Feed {
     pub title: String,
     pub items: Vec<Item>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub language: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub home_page_url: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed_url: Option<String>,
@@ -82,6 +84,7 @@ impl Default for Feed {
             version: VERSION_1.to_string(),
             title: "".to_string(),
             items: vec![],
+            language: None,
             home_page_url: None,
             feed_url: None,
             description: None,

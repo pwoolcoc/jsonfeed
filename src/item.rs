@@ -19,6 +19,7 @@ pub enum Content {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Item {
     pub id: String,
+    pub language: Option<String>,
     pub url: Option<String>,
     pub external_url: Option<String>,
     pub title: Option<String>,
@@ -45,6 +46,7 @@ impl Default for Item {
     fn default() -> Item {
         Item {
             id: "".to_string(),
+            language: None,
             url: None,
             external_url: None,
             title: None,
@@ -128,6 +130,7 @@ impl<'de> Deserialize<'de> for Item {
     {
         enum Field {
             Id,
+            Language,
             Url,
             ExternalUrl,
             Title,
@@ -162,6 +165,7 @@ impl<'de> Deserialize<'de> for Item {
                     {
                         match value {
                             "id" => Ok(Field::Id),
+                            "language" => Ok(Field::Language),
                             "url" => Ok(Field::Url),
                             "external_url" => Ok(Field::ExternalUrl),
                             "title" => Ok(Field::Title),
@@ -197,6 +201,7 @@ impl<'de> Deserialize<'de> for Item {
                 where V: MapAccess<'de>
             {
                 let mut id = None;
+                let mut language = None;
                 let mut url = None;
                 let mut external_url = None;
                 let mut title = None;
@@ -219,6 +224,12 @@ impl<'de> Deserialize<'de> for Item {
                                 return Err(de::Error::duplicate_field("id"));
                             }
                             id = Some(map.next_value()?);
+                        },
+                        Field::Language => {
+                            if language.is_some() {
+                                return Err(de::Error::duplicate_field("language"));
+                            }
+                            language = Some(map.next_value()?);
                         },
                         Field::Url => {
                             if url.is_some() {
@@ -323,6 +334,7 @@ impl<'de> Deserialize<'de> for Item {
 
                 Ok(Item {
                     id,
+                    language,
                     url,
                     external_url,
                     title,
@@ -342,6 +354,7 @@ impl<'de> Deserialize<'de> for Item {
 
         const FIELDS: &'static [&'static str] = &[
             "id",
+            "language",
             "url",
             "external_url",
             "title",
