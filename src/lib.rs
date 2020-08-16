@@ -27,20 +27,27 @@
 //! ```
 
 extern crate serde;
-#[macro_use] extern crate error_chain;
 #[macro_use] extern crate serde_derive;
 #[macro_use] extern crate serde_with;
+#[macro_use] extern crate thiserror;
 extern crate serde_json;
 
-mod errors;
+use std::io::Write;
+use thiserror::Error;
+
 mod item;
 mod feed;
 
-pub use errors::*;
 pub use item::*;
 pub use feed::{Feed, Author, Attachment};
 
-use std::io::Write;
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error(transparent)]
+    Json(#[from] serde_json::Error),
+}
+
+type Result<T> = std::result::Result<T, Error>;
 
 /// Attempts to convert a string slice to a Feed object
 ///
