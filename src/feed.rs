@@ -2,7 +2,7 @@
 use item::Item;
 use serde_with::skip_serializing_none;
 
-const VERSION_1_1: &'static str = "https://jsonfeed.org/version/1.1";
+pub const VERSION_1_1: &'static str = "https://jsonfeed.org/version/1.1";
 
 /// Represents a single feed
 ///

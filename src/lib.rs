@@ -40,6 +40,7 @@ mod feed;
 
 pub use item::*;
 pub use feed::{Feed, Author, Attachment};
+pub use feed::VERSION_1_1 as VERSION;
 
 #[derive(Error, Debug)]
 pub enum Error {
