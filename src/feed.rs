@@ -82,6 +82,7 @@ impl Default for Feed {
 }
 
 /// Represents an `attachment` for an item
+#[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Attachment {
     url: String,
@@ -92,6 +93,7 @@ pub struct Attachment {
 }
 
 /// Represents an `author` in both a feed and a feed item
+#[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Author {
     pub name: Option<String>,
