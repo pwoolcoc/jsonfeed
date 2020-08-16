@@ -2,6 +2,7 @@ use std::default::Default;
 
 use item::Item;
 use builder::Builder;
+use serde_with::skip_serializing_none;
 
 const VERSION_1: &'static str = "https://jsonfeed.org/version/1";
 
@@ -38,36 +39,25 @@ const VERSION_1: &'static str = "https://jsonfeed.org/version/1";
 /// );
 /// # }
 /// ```
+
+#[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Feed {
     pub version: String,
     pub title: String,
     pub items: Vec<Item>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub home_page_url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub feed_url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub user_comment: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub next_url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub favicon: Option<String>,
-
     #[deprecated(since="0.3.0", note="Please use `authors` instead")]
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<Author>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub authors: Option<Vec<Author>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub expired: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub hubs: Option<Vec<Hub>>,
 }
 

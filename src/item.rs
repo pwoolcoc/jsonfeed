@@ -6,16 +6,20 @@ use builder::ItemBuilder;
 
 use serde::ser::{Serialize, Serializer, SerializeStruct};
 use serde::de::{self, Deserialize, Deserializer, Visitor, MapAccess};
+use serde_with::skip_serializing_none;
 
 /// Represents the `content_html` and `content_text` attributes of an item
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub enum Content {
+    #[serde(rename = "content_html")]
     Html(String),
+    #[serde(rename = "content_text")]
     Text(String),
     Both(String, String),
 }
 
 /// Represents an item in a feed
+#[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq)]
 pub struct Item {
     pub id: String,
