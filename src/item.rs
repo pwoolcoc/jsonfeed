@@ -28,7 +28,9 @@ pub struct Item {
     pub banner_image: Option<String>,
     pub date_published: Option<String>, // todo DateTime objects?
     pub date_modified: Option<String>,
+    #[deprecated(since="0.3.0", note="Please use `authors` instead")]
     pub author: Option<Author>,
+    pub authors: Option<Vec<Author>>,
     pub tags: Option<Vec<String>>,
     pub attachments: Option<Vec<Attachment>>,
 }
@@ -53,6 +55,7 @@ impl Default for Item {
             date_published: None,
             date_modified: None,
             author: None,
+            authors: None,
             tags: None,
             attachments: None,
         }
@@ -106,6 +109,9 @@ impl Serialize for Item {
         if self.author.is_some() {
             state.serialize_field("author", &self.author)?;
         }
+        if self.authors.is_some() {
+            state.serialize_field("authors", &self.authors)?;
+        }
         if self.tags.is_some() {
             state.serialize_field("tags", &self.tags)?;
         }
@@ -133,6 +139,7 @@ impl<'de> Deserialize<'de> for Item {
             DatePublished,
             DateModified,
             Author,
+            Authors,
             Tags,
             Attachments,
         };
@@ -166,6 +173,7 @@ impl<'de> Deserialize<'de> for Item {
                             "date_published" => Ok(Field::DatePublished),
                             "date_modified" => Ok(Field::DateModified),
                             "author" => Ok(Field::Author),
+                            "authors" => Ok(Field::Authors),
                             "tags" => Ok(Field::Tags),
                             "attachments" => Ok(Field::Attachments),
                             _ => Err(de::Error::unknown_field(value, FIELDS)),
@@ -200,6 +208,7 @@ impl<'de> Deserialize<'de> for Item {
                 let mut date_published = None;
                 let mut date_modified = None;
                 let mut author = None;
+                let mut authors = None;
                 let mut tags = None;
                 let mut attachments = None;
 
@@ -277,6 +286,12 @@ impl<'de> Deserialize<'de> for Item {
                             }
                             author = map.next_value()?;
                         },
+                        Field::Authors => {
+                            if authors.is_some() {
+                                return Err(de::Error::duplicate_field("authors"));
+                            }
+                            authors = map.next_value()?;
+                        },
                         Field::Tags => {
                             if tags.is_some() {
                                 return Err(de::Error::duplicate_field("tags"));
@@ -318,6 +333,7 @@ impl<'de> Deserialize<'de> for Item {
                     date_published,
                     date_modified,
                     author,
+                    authors,
                     tags,
                     attachments,
                 })
@@ -336,6 +352,7 @@ impl<'de> Deserialize<'de> for Item {
             "date_published",
             "date_modified",
             "author",
+            "authors",
             "tags",
             "attachments",
         ];
@@ -363,13 +380,20 @@ mod tests {
             banner_image: Some("http://img.com/blah".into()),
             date_published: Some("2017-01-01 10:00:00".into()),
             date_modified: Some("2017-01-01 10:00:00".into()),
-            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            authors: Some(
+                vec![
+                    Author::new()
+                        .name("bob jones")
+                        .url("http://example.com")
+                        .avatar("http://img.com/blah")]),
+
             tags: Some(vec!["json".into(), "feed".into()]),
             attachments: Some(vec![]),
+            ..Default::default()
         };
         assert_eq!(
             serde_json::to_string(&item).unwrap(),
-            r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":null,"summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#
+            r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":null,"summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","authors":[{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"}],"tags":["json","feed"],"attachments":[]}"#
         );
     }
 
@@ -387,13 +411,14 @@ mod tests {
             banner_image: Some("http://img.com/blah".into()),
             date_published: Some("2017-01-01 10:00:00".into()),
             date_modified: Some("2017-01-01 10:00:00".into()),
-            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            authors: Some(vec![Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")]),
             tags: Some(vec!["json".into(), "feed".into()]),
             attachments: Some(vec![]),
+            ..Default::default()
         };
         assert_eq!(
             serde_json::to_string(&item).unwrap(),
-            r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":null,"content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#
+            r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":null,"content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","authors":[{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"}],"tags":["json","feed"],"attachments":[]}"#
         );
     }
 
@@ -411,20 +436,21 @@ mod tests {
             banner_image: Some("http://img.com/blah".into()),
             date_published: Some("2017-01-01 10:00:00".into()),
             date_modified: Some("2017-01-01 10:00:00".into()),
-            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            authors: Some(vec![Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")]),
             tags: Some(vec!["json".into(), "feed".into()]),
             attachments: Some(vec![]),
+            ..Default::default()
         };
         assert_eq!(
             serde_json::to_string(&item).unwrap(),
-            r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#
+            r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","authors":[{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"}],"tags":["json","feed"],"attachments":[]}"#
         );
     }
 
     #[test]
     #[allow(non_snake_case)]
     fn deserialize_item__content_html() {
-        let json = r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":null,"summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#;
+        let json = r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":null,"summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","authors":[{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"}],"tags":["json","feed"],"attachments":[]}"#;
         let item: Item = serde_json::from_str(&json).unwrap();
         let expected = Item {
             id: "1".into(),
@@ -437,9 +463,10 @@ mod tests {
             banner_image: Some("http://img.com/blah".into()),
             date_published: Some("2017-01-01 10:00:00".into()),
             date_modified: Some("2017-01-01 10:00:00".into()),
-            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            authors: Some(vec![Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")]),
             tags: Some(vec!["json".into(), "feed".into()]),
             attachments: Some(vec![]),
+            ..Default::default()
         };
         assert_eq!(item, expected);
     }
@@ -447,7 +474,7 @@ mod tests {
     #[test]
     #[allow(non_snake_case)]
     fn deserialize_item__content_text() {
-        let json = r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":null,"content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#;
+        let json = r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":null,"content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","authors":[{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"}],"tags":["json","feed"],"attachments":[]}"#;
         let item: Item = serde_json::from_str(&json).unwrap();
         let expected = Item {
             id: "1".into(),
@@ -460,9 +487,10 @@ mod tests {
             banner_image: Some("http://img.com/blah".into()),
             date_published: Some("2017-01-01 10:00:00".into()),
             date_modified: Some("2017-01-01 10:00:00".into()),
-            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            authors: Some(vec![Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")]),
             tags: Some(vec!["json".into(), "feed".into()]),
             attachments: Some(vec![]),
+            ..Default::default()
         };
         assert_eq!(item, expected);
     }
@@ -470,7 +498,7 @@ mod tests {
     #[test]
     #[allow(non_snake_case)]
     fn deserialize_item__content_both() {
-        let json = r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","author":{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"},"tags":["json","feed"],"attachments":[]}"#;
+        let json = r#"{"id":"1","url":"http://example.com/feed.json","external_url":"http://example.com/feed.json","title":"feed title","content_html":"<p>content</p>","content_text":"content","summary":"feed summary","image":"http://img.com/blah","banner_image":"http://img.com/blah","date_published":"2017-01-01 10:00:00","date_modified":"2017-01-01 10:00:00","authors":[{"name":"bob jones","url":"http://example.com","avatar":"http://img.com/blah"}],"tags":["json","feed"],"attachments":[]}"#;
         let item: Item = serde_json::from_str(&json).unwrap();
         let expected = Item {
             id: "1".into(),
@@ -483,9 +511,10 @@ mod tests {
             banner_image: Some("http://img.com/blah".into()),
             date_published: Some("2017-01-01 10:00:00".into()),
             date_modified: Some("2017-01-01 10:00:00".into()),
-            author: Some(Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")),
+            authors: Some(vec![Author::new().name("bob jones").url("http://example.com").avatar("http://img.com/blah")]),
             tags: Some(vec!["json".into(), "feed".into()]),
             attachments: Some(vec![]),
+            ..Default::default()
         };
         assert_eq!(item, expected);
     }

@@ -57,8 +57,12 @@ pub struct Feed {
     pub icon: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub favicon: Option<String>,
+
+    #[deprecated(since="0.3.0", note="Please use `authors` instead")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<Author>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub authors: Option<Vec<Author>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expired: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -86,6 +90,7 @@ impl Default for Feed {
             icon: None,
             favicon: None,
             author: None,
+            authors: None,
             expired: None,
             hubs: None,
         }

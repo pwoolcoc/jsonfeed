@@ -6,7 +6,7 @@ homepage = "https://github.com/pwoolcoc/jsonfeed"
 license = "MIT/Apache-2.0"
 name = "jsonfeed"
 readme = "README.adoc"
-version = "0.2.0"
+version = "0.3.0"
 
 [dependencies]
 error-chain = "0.10.0"

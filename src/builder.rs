@@ -44,6 +44,7 @@ pub struct ItemBuilder {
     pub date_published: Option<String>,
     pub date_modified: Option<String>,
     pub author: Option<Author>,
+    pub authors: Option<Vec<Author>>,
     pub tags: Option<Vec<String>>,
     pub attachments: Option<Vec<Attachment>>,
 }
@@ -62,6 +63,7 @@ impl ItemBuilder {
             date_published: None,
             date_modified: None,
             author: None,
+            authors: None,
             tags: None,
             attachments: None,
         }
@@ -112,6 +114,7 @@ impl ItemBuilder {
             date_published: self.date_published,
             date_modified: self.date_modified,
             author: self.author,
+            authors: self.authors,
             tags: self.tags,
             attachments: self.attachments
         })
