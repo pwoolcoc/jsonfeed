@@ -35,9 +35,10 @@ extern crate serde_json;
 use std::io::Write;
 use thiserror::Error;
 
-pub mod item;
+mod item;
 mod feed;
 
+pub use item::*;
 pub use feed::{Feed, Author, Attachment, Hub};
 pub use feed::VERSION_1_1 as VERSION;
 
