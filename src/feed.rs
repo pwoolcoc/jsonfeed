@@ -1,7 +1,6 @@
 use std::default::Default;
 
 use item::Item;
-use builder::Builder;
 use serde_with::skip_serializing_none;
 
 const VERSION_1: &'static str = "https://jsonfeed.org/version/1";
@@ -59,13 +58,6 @@ pub struct Feed {
     pub authors: Option<Vec<Author>>,
     pub expired: Option<bool>,
     pub hubs: Option<Vec<Hub>>,
-}
-
-impl Feed {
-    /// Used to construct a Feed object
-    pub fn builder() -> Builder {
-        Builder::new()
-    }
 }
 
 impl Default for Feed {

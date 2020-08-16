@@ -48,7 +48,6 @@ extern crate serde_json;
 mod errors;
 mod item;
 mod feed;
-mod builder;
 
 pub use errors::*;
 pub use item::*;
