@@ -94,9 +94,9 @@ pub struct Attachment {
 /// Represents an `author` in both a feed and a feed item
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Author {
-    name: Option<String>,
-    url: Option<String>,
-    avatar: Option<String>,
+    pub name: Option<String>,
+    pub url: Option<String>,
+    pub avatar: Option<String>,
 }
 
 impl Author {
