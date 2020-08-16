@@ -1,5 +1,4 @@
-use std::default::Default;
-
+#![allow(deprecated)]
 use item::Item;
 use serde_with::skip_serializing_none;
 

@@ -1,10 +1,5 @@
-use std::fmt;
-use std::default::Default;
-
+#![allow(deprecated)]
 use feed::{Author, Attachment};
-
-use serde::ser::{Serialize, Serializer, SerializeStruct};
-use serde::de::{self, Deserialize, Deserializer, Visitor, MapAccess};
 use serde_with::skip_serializing_none;
 
 /// Represents an item in a feed
