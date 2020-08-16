@@ -3,7 +3,7 @@ use std::default::Default;
 use item::Item;
 use serde_with::skip_serializing_none;
 
-const VERSION_1: &'static str = "https://jsonfeed.org/version/1";
+const VERSION_1_1: &'static str = "https://jsonfeed.org/version/1.1";
 
 /// Represents a single feed
 ///
@@ -19,7 +19,7 @@ const VERSION_1: &'static str = "https://jsonfeed.org/version/1";
 /// let feed: Feed = Feed::default();
 /// assert_eq!(
 ///     jsonfeed::to_string(&feed).unwrap(),
-///     "{\"version\":\"https://jsonfeed.org/version/1\",\"title\":\"\",\"items\":[]}"
+///     "{\"version\":\"https://jsonfeed.org/version/1.1\",\"title\":\"\",\"items\":[]}"
 /// );
 /// # }
 /// ```
@@ -30,7 +30,7 @@ const VERSION_1: &'static str = "https://jsonfeed.org/version/1";
 /// # extern crate jsonfeed;
 /// # use jsonfeed::Feed;
 /// # fn main() {
-/// let json = "{\"version\":\"https://jsonfeed.org/version/1\",\"title\":\"\",\"items\":[]}";
+/// let json = "{\"version\":\"https://jsonfeed.org/version/1.1\",\"title\":\"\",\"items\":[]}";
 /// let feed: Feed = jsonfeed::from_str(&json).unwrap();
 /// assert_eq!(
 ///     feed,
@@ -63,7 +63,7 @@ pub struct Feed {
 impl Default for Feed {
     fn default() -> Feed {
         Feed {
-            version: VERSION_1.to_string(),
+            version: VERSION_1_1.to_string(),
             title: "".to_string(),
             items: vec![],
             language: None,
@@ -142,7 +142,7 @@ mod tests {
     #[test]
     fn serialize_feed() {
         let feed = Feed {
-            version: "https://jsonfeed.org/version/1".to_string(),
+            version: "https://jsonfeed.org/version/1.1".to_string(),
             title: "some title".to_string(),
             items: vec![],
             home_page_url: None,
@@ -152,16 +152,16 @@ mod tests {
         };
         assert_eq!(
             serde_json::to_string(&feed).unwrap(),
-            r#"{"version":"https://jsonfeed.org/version/1","title":"some title","items":[],"expired":true}"#
+            r#"{"version":"https://jsonfeed.org/version/1.1","title":"some title","items":[],"expired":true}"#
         );
     }
 
     #[test]
     fn deserialize_feed() {
-        let json = r#"{"version":"https://jsonfeed.org/version/1","title":"some title","items":[]}"#;
+        let json = r#"{"version":"https://jsonfeed.org/version/1.1","title":"some title","items":[]}"#;
         let feed: Feed = serde_json::from_str(&json).unwrap();
         let expected = Feed {
-            version: "https://jsonfeed.org/version/1".to_string(),
+            version: "https://jsonfeed.org/version/1.1".to_string(),
              title: "some title".to_string(),
              items: vec![],
              ..Default::default()
@@ -261,7 +261,7 @@ mod tests {
     #[test]
     fn deser_podcast() {
         let json = r#"{
-  "version": "https://jsonfeed.org/version/1",
+  "version": "https://jsonfeed.org/version/1.1",
   "title": "Timetable",
   "home_page_url": "http://timetable.manton.org/",
   "items": [

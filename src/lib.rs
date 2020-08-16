@@ -15,23 +15,10 @@
 //! fn run() -> Result<(), jsonfeed::Error> {
 //!     let j = r#"{
 //!         "title": "my feed",
-//!         "version": "https://jsonfeed.org/version/1",
+//!         "version": "https://jsonfeed.org/version/1.1",
 //!         "items": []
 //!     }"#;
 //!     let feed = jsonfeed::from_str(j).unwrap();
-//!
-//!     let new_feed = Feed::builder()
-//!                         .title("some other feed")
-//!                         .item(Item::builder()
-//!                                 .title("some item title")
-//!                                 .content_html("<p>Hello, World</p>")
-//!                                 .build()?)
-//!                         .item(Item::builder()
-//!                                 .title("some other item title")
-//!                                 .content_text("Hello, World!")
-//!                                 .build()?)
-//!                         .build();
-//!     println!("{}", jsonfeed::to_string(&new_feed).unwrap());
 //!     Ok(())
 //! }
 //! fn main() {
@@ -64,7 +51,7 @@ use std::io::Write;
 /// # use jsonfeed::Feed;
 /// # use std::default::Default;
 /// # fn main() {
-/// let json = r#"{"version": "https://jsonfeed.org/version/1", "title": "", "items": []}"#;
+/// let json = r#"{"version": "https://jsonfeed.org/version/1.1", "title": "", "items": []}"#;
 /// let feed: Feed = jsonfeed::from_str(&json).unwrap();
 ///
 /// assert_eq!(feed, Feed::default());
@@ -135,7 +122,7 @@ mod tests {
 
     #[test]
     fn from_str() {
-        let feed = r#"{"version": "https://jsonfeed.org/version/1","title":"","items":[]}"#;
+        let feed = r#"{"version": "https://jsonfeed.org/version/1.1","title":"","items":[]}"#;
         let expected = Feed::default();
         assert_eq!(
                 super::from_str(&feed).unwrap(),
@@ -144,7 +131,7 @@ mod tests {
     }
     #[test]
     fn from_reader() {
-        let feed = r#"{"version": "https://jsonfeed.org/version/1","title":"","items":[]}"#;
+        let feed = r#"{"version": "https://jsonfeed.org/version/1.1","title":"","items":[]}"#;
         let feed = feed.as_bytes();
         let feed = Cursor::new(feed);
         let expected = Feed::default();
@@ -155,7 +142,7 @@ mod tests {
     }
     #[test]
     fn from_slice() {
-        let feed = r#"{"version": "https://jsonfeed.org/version/1","title":"","items":[]}"#;
+        let feed = r#"{"version": "https://jsonfeed.org/version/1.1","title":"","items":[]}"#;
         let feed = feed.as_bytes();
         let expected = Feed::default();
         assert_eq!(
@@ -165,7 +152,7 @@ mod tests {
     }
     #[test]
     fn from_value() {
-        let feed = r#"{"version": "https://jsonfeed.org/version/1","title":"","items":[]}"#;
+        let feed = r#"{"version": "https://jsonfeed.org/version/1.1","title":"","items":[]}"#;
         let feed: serde_json::Value = serde_json::from_str(&feed).unwrap();
         let expected = Feed::default();
         assert_eq!(
@@ -176,7 +163,7 @@ mod tests {
     #[test]
     fn to_string() {
         let feed = Feed::default();
-        let expected = r#"{"version":"https://jsonfeed.org/version/1","title":"","items":[]}"#;
+        let expected = r#"{"version":"https://jsonfeed.org/version/1.1","title":"","items":[]}"#;
         assert_eq!(
                 super::to_string(&feed).unwrap(),
                 expected
@@ -186,7 +173,7 @@ mod tests {
     fn to_string_pretty() {
         let feed = Feed::default();
         let expected = r#"{
-  "version": "https://jsonfeed.org/version/1",
+  "version": "https://jsonfeed.org/version/1.1",
   "title": "",
   "items": []
 }"#;
@@ -197,7 +184,7 @@ mod tests {
     }
     #[test]
     fn to_value() {
-        let feed = r#"{"version":"https://jsonfeed.org/version/1","title":"","items":[]}"#;
+        let feed = r#"{"version":"https://jsonfeed.org/version/1.1","title":"","items":[]}"#;
         let expected: serde_json::Value = serde_json::from_str(&feed).unwrap();
         assert_eq!(
                 super::to_value(Feed::default()).unwrap(),
@@ -206,7 +193,7 @@ mod tests {
     }
     #[test]
     fn to_vec() {
-        let feed = r#"{"version":"https://jsonfeed.org/version/1","title":"","items":[]}"#;
+        let feed = r#"{"version":"https://jsonfeed.org/version/1.1","title":"","items":[]}"#;
         let expected = feed.as_bytes();
         assert_eq!(
                 super::to_vec(&Feed::default()).unwrap(),
@@ -216,7 +203,7 @@ mod tests {
     #[test]
     fn to_vec_pretty() {
         let feed = r#"{
-  "version": "https://jsonfeed.org/version/1",
+  "version": "https://jsonfeed.org/version/1.1",
   "title": "",
   "items": []
 }"#;
@@ -228,7 +215,7 @@ mod tests {
     }
     #[test]
     fn to_writer() {
-        let feed = r#"{"version":"https://jsonfeed.org/version/1","title":"","items":[]}"#;
+        let feed = r#"{"version":"https://jsonfeed.org/version/1.1","title":"","items":[]}"#;
         let feed = feed.as_bytes();
         let mut writer = Cursor::new(Vec::with_capacity(feed.len()));
         super::to_writer(&mut writer, &Feed::default()).expect("Could not write to writer");
@@ -238,7 +225,7 @@ mod tests {
     #[test]
     fn to_writer_pretty() {
         let feed = r#"{
-  "version": "https://jsonfeed.org/version/1",
+  "version": "https://jsonfeed.org/version/1.1",
   "title": "",
   "items": []
 }"#;
